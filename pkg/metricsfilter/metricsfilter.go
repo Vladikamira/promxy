@@ -15,14 +15,24 @@ func NewMetricAllowed() *MetricsAllowed {
 	return &m
 }
 
-func (m *MetricsAllowed) Update(items *model.LabelValues) *MetricsAllowed {
-
+func (m *MetricsAllowed) Update(discovered *model.LabelValues, included *[]string, excluded *[]string) *MetricsAllowed {
+	// cleanup
 	m.items.Clear()
-	for _, item := range *items {
+
+	// add discoverd items
+	for _, item := range *discovered {
 		m.items.Add(string(item))
 	}
-	m.items.Remove("grpc_client_handled_total")
-	m.items.Remove("up")
+
+	// add statically included items
+	for _, item := range *included {
+		m.items.Add(string(item))
+	}
+
+	// delete statically excluded items
+	for _, item := range *excluded {
+		m.items.Remove(string(item))
+	}
 	return m
 }
 

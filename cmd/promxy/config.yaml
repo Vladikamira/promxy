@@ -29,10 +29,22 @@ remote_write:
 ### Promxy configuration
 ##
 promxy:
-  # metrics_filtering option enable filtering by metric name collected and merged from all backends
+  # metrics filterign feature create a white list for "__name__" labels aka Metric Name.
   # The main purpose is not send over requests with metric name which backend doesn't have and responce/fail sooner
   # It could be useful if query Cloud Prometheus like GCP one, which could charge you on every API call
-  metrics_filtering: false
+  metrics_filtering:
+          # feature should be explicitly enabled. Default is false
+          enabled: false
+          # auto discovery will try to fetch metric names from all available backends
+          auto_discovery: true
+          # include into white list some metric names
+          include:
+            - "some_metric_1"
+            - "some_metric_2"
+          # exclude from the white list some metric names
+          exclude:
+            - "some_metric_1"
+            - "some_metric_2"
   server_groups:
     # All upstream prometheus service discovery mechanisms are supported with the same
     # markup, all defined in https://github.com/prometheus/prometheus/blob/master/discovery/config/config.go#L33

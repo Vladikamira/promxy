@@ -165,13 +165,17 @@ func (p *ProxyStorage) ApplyConfig(c *proxyconfig.Config) error {
 	newState.Ready() // Wait for the newstate to be ready
 
 	// fetch labels if metrics filtering feature is enabled
-	if newState.cfg.MetricsFilteringFeature {
+	if newState.cfg.MetricsFiltering.EnableMetricsFiltering {
+		var metric_names = model.LabelValues{}
 		// update labels
-		// ignore waring and errors as it would means that backends potentially not ready
-		// which could be fine in some cases. Reload will help to fix it
-		metric_names, _, _ := newState.client.LabelValues(context.Background(), "__name__", nil, time.Now(), time.Now())
+		if newState.cfg.MetricsFiltering.AutoDiscoveryMetricNames {
+			// ignore waring and errors as it would means that backends potentially not ready
+			// which could be fine in some cases. Reload will help to fix it
+			metric_names, _, _ = newState.client.LabelValues(context.Background(), "__name__", nil, time.Now(), time.Now())
+		}
+
 		newState.metricsAllowed = metricsfilter.NewMetricAllowed()
-		newState.metricsAllowed.Update(&metric_names)
+		newState.metricsAllowed.Update(&metric_names, &newState.cfg.MetricsFiltering.IncludeMetricNames, &newState.cfg.MetricsFiltering.ExcludeMetricNames)
 		promxyMetricsFilterAmount.Set(float64(metric_names.Len()))
 	}
 
@@ -240,7 +244,7 @@ func (p *ProxyStorage) NodeReplacer(ctx context.Context, s *parser.EvalStmt, nod
 
 	st := p.GetState()
 	// check that metrics is allowed to be queried
-	if st.cfg.MetricsFilteringFeature {
+	if st.cfg.MetricsFiltering.EnableMetricsFiltering {
 
 		ast, _ := parser.ParseExpr(node.String())
 		if ast != nil {

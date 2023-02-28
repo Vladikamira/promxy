@@ -54,6 +54,18 @@ type Config struct {
 type PromxyConfig struct {
 	// Config for each of the server groups promxy is configured to aggregate
 	ServerGroups []*servergroup.Config `yaml:"server_groups"`
-	// parameter to control filtering feature
-	MetricsFilteringFeature bool `yaml:"metrics_filtering"`
+	// Config to control metrics filtering
+	MetricsFiltering MetricsFilter `yaml:"metrics_filtering"`
+}
+
+// Metrics Filtering options
+type MetricsFilter struct {
+	// enable/disable White listing of metrics names
+	EnableMetricsFiltering bool `yaml:"enable"`
+	// control auto discovery for metric names from backend
+	AutoDiscoveryMetricNames bool `yaml:"auto_discovery"`
+	// Include metric names into Allowed list
+	IncludeMetricNames []string `yaml:"include"`
+	// Exclude metric names from the Allowed list
+	ExcludeMetricNames []string `yaml:"exclude"`
 }
