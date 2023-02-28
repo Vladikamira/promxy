@@ -32,9 +32,11 @@ promxy:
   # metrics filterign feature create a white list for "__name__" labels aka Metric Name.
   # The main purpose is not send over requests with metric name which backend doesn't have and responce/fail sooner
   # It could be useful if query Cloud Prometheus like GCP one, which could charge you on every API call
+  #
+  # Note! Regular exprations over metric names are not supported yet in the filtering. (example: __name__=~"some_name_.+")
   metrics_filtering:
           # feature should be explicitly enabled. Default is false
-          enabled: false
+          enable: false
           # auto discovery will try to fetch metric names from all available backends
           auto_discovery: true
           # include into white list some metric names
